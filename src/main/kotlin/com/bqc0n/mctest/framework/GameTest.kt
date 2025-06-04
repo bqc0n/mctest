@@ -1,5 +1,10 @@
 package com.bqc0n.mctest.framework
 
+/**
+ * Annotation for marking a function as a game test.
+ * The method must have exactly one parameter of type [IGameTestHelper].
+ */
+@Target(AnnotationTarget.FUNCTION)
 annotation class GameTest(
     /**
      * The Structure Template name for this test.
