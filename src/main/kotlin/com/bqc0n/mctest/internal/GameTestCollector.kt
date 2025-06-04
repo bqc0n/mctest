@@ -2,6 +2,7 @@ package com.bqc0n.mctest.internal
 
 import com.bqc0n.mctest.framework.GameTest
 import com.bqc0n.mctest.framework.GameTestHolder
+import com.bqc0n.mctest.framework.IGameTestHelper
 import net.minecraftforge.fml.common.discovery.ASMDataTable
 import java.lang.reflect.Method
 
@@ -12,8 +13,15 @@ object GameTestCollector {
         val asmDataSet: Set<ASMDataTable.ASMData> = asmDataTable.getAll(annotationClassName)
         for (asmData in asmDataSet) {
             val javaClass = Class.forName(asmData.className)
-            val testMethods = javaClass.methods.filter { it.isAnnotationPresent(GameTest::class.java) }
-            methods.addAll(testMethods)
+            for (method in javaClass.methods) {
+                if (!method.isAnnotationPresent(GameTest::class.java)) continue
+
+                if (method.parameterCount != 1 || method.parameters[0].type != IGameTestHelper::class.java) {
+                    throw IllegalArgumentException(
+                        "Game test method '${method.name}' in class '${javaClass.name}' must have exactly one parameter of type IGameTestHelper."
+                    )
+                }
+            }
         }
     }
 }
