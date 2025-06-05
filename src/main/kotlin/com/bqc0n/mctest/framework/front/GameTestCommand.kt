@@ -8,6 +8,7 @@ import net.minecraft.command.CommandBase
 import net.minecraft.command.CommandException
 import net.minecraft.command.ICommandSender
 import net.minecraft.server.MinecraftServer
+import net.minecraft.util.text.TextComponentString
 
 object GameTestCommand : CommandBase() {
     override fun getName(): String {
@@ -25,12 +26,13 @@ object GameTestCommand : CommandBase() {
 
     override fun execute(server: MinecraftServer, sender: ICommandSender, args: Array<out String?>) {
         if (args.isEmpty()) {
-            throw CommandException("Usage: /mctest COMMAND [args...]. Use /mctest help for usage.")
+            throw CommandException(getUsage(sender))
         }
 
         when (args[0]) {
             "runall" -> runAll(server, sender, args)
-            else -> throw CommandException("Unknown command: ${args[0]}. Use /mctest help for usage.")
+            "help" -> sender.sendMessage(TextComponentString(getUsage(sender)))
+            else -> throw CommandException(getUsage(sender))
         }
     }
 

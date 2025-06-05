@@ -1,12 +1,13 @@
 package com.bqc0n.mctest.internal
 
-import com.bqc0n.mctest.McTest
 import com.bqc0n.mctest.framework.GameTest
 import com.bqc0n.mctest.framework.GameTestDefinition
 import com.bqc0n.mctest.framework.GameTestHolder
+import com.bqc0n.mctest.framework.GameTestRegistry
 import com.bqc0n.mctest.framework.IGameTestHelper
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.discovery.ASMDataTable
+import org.jetbrains.annotations.VisibleForTesting
 import java.lang.reflect.Method
 
 object GameTestCollector {
@@ -15,25 +16,43 @@ object GameTestCollector {
         val annotationClassName: String = GameTestHolder::class.java.canonicalName
         val asmDataSet: Set<ASMDataTable.ASMData> = asmDataTable.getAll(annotationClassName)
         for (asmData in asmDataSet) {
-            val javaClass: Class<*> = Class.forName(asmData.className)
-            if (!javaClass.isAnnotationPresent(GameTestHolder::class.java)) continue
-            val gameTestNamespace = javaClass.getAnnotation(GameTestHolder::class.java)!!.namespace
-            for (method in javaClass.methods) {
+            val clazz: Class<*> = Class.forName(asmData.className)
+            if (!clazz.isAnnotationPresent(GameTestHolder::class.java)) continue
+            val holder = clazz.getAnnotation(GameTestHolder::class.java)!!
+            val gameTestNamespace = holder.namespace
+            for (method in clazz.methods) {
                 if (!method.isAnnotationPresent(GameTest::class.java)) continue
                 validateTestMethod(method)
                 val annotation: GameTest = method.getAnnotation(GameTest::class.java)!!
-                val structureNameSuffix: String = annotation.template.ifEmpty { method.name }.lowercase()
-                val structureNamePrefix: String = javaClass.simpleName.lowercase()
-                val structureLocation = ResourceLocation(gameTestNamespace, "$structureNamePrefix.$structureNameSuffix")
                 val timeOutTicks = annotation.timeoutTicks
                 val setupTicks = annotation.setupTicks
-                val testName = "${gameTestNamespace}.${method.name.lowercase()}"
                 val definition = GameTestDefinition(
-                    testName, structureLocation, setupTicks, timeOutTicks,
+                    createTestName(holder, clazz, method),
+                    createStructureLocation(holder, clazz, method),
+                    setupTicks, timeOutTicks,
                     methodIntoConsumer(method)
                 )
-                McTest.testsTemp.add(definition)
+                GameTestRegistry.register(definition)
             }
+        }
+    }
+
+    @VisibleForTesting
+    fun createTestName(holder: GameTestHolder, clazz: Class<*>, method: Method): String {
+        return "${holder.namespace}.${clazz.simpleName.lowercase()}.${method.name.lowercase()}"
+    }
+
+    @VisibleForTesting
+    fun createStructureLocation(holder: GameTestHolder, clazz: Class<*>, method: Method): ResourceLocation {
+        val gameTest = method.getAnnotation(GameTest::class.java)!!
+        if (gameTest.template.isEmpty()) {
+            return ResourceLocation(holder.namespace, "${clazz.simpleName.lowercase()}.${method.name.lowercase()}")
+        }
+        val structureName = gameTest.template
+        return if (structureName.contains(":")) {
+            ResourceLocation(structureName)
+        } else {
+            ResourceLocation("${holder.namespace}:${clazz.simpleName}.${structureName.lowercase()}")
         }
     }
 

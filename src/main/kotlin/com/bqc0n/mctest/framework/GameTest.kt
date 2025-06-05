@@ -7,10 +7,13 @@ package com.bqc0n.mctest.framework
 @Target(AnnotationTarget.FUNCTION)
 annotation class GameTest(
     /**
-     * The Structure Template name for this test.
-     * If not specified, the class name and method name will be used.
-     * The location will be `${namespace}:${className}.${templateName}`.
-     * e.g.: `mctest:MyTest.testSomething`
+     * The Structure Template name for this test. Lowercase.
+     * You can include a namespace if needed: `namespace:templateName`.
+     * namespace defaults to the one you specified in the `@GameTestHolder`.
+     *
+     * If empty, the class name and method name will be used.
+     * The location will be `${namespace}:${className}.${methodName}`.
+     * e.g.: `mctest:mytest.testsomething`
      */
     val template: String = "",
     val timeoutTicks: Int = 100,
