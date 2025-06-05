@@ -15,9 +15,6 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent
     modLanguageAdapter = "io.github.chaosunity.forgelin.KotlinAdapter",
 )
 object McTest {
-
-    val testsTemp = mutableListOf<GameTestDefinition>()
-
     @Mod.EventHandler
     fun preInit(e: FMLPreInitializationEvent) {
         val asmDataTable = e.asmData

@@ -1,9 +1,6 @@
 package com.bqc0n.mctest.framework.front
 
-import com.bqc0n.mctest.McTest.testsTemp
 import com.bqc0n.mctest.framework.GameTestContext
-import com.bqc0n.mctest.framework.GameTestDefinition
-import com.bqc0n.mctest.framework.GameTestExecutor
 import net.minecraft.command.CommandBase
 import net.minecraft.command.CommandException
 import net.minecraft.command.ICommandSender
@@ -40,10 +37,5 @@ object GameTestCommand : CommandBase() {
         val worldServer = server.worlds[0] // Assuming the first world is the target
         val pos = sender.position
         val gameTestContext = GameTestContext(worldServer, pos)
-
-        for (test in testsTemp) {
-            val executor = GameTestExecutor(gameTestContext, test)
-            executor.prepare()
-        }
     }
 }
