@@ -15,6 +15,8 @@ object GameTestExecutor {
     fun runAll(world: WorldServer, pos: BlockPos) {
         GameTestRegistry.getAllTests().forEach { (name: String, definition: GameTestDefinition) ->
             val context = GameTestContext(world, pos)
+            val testCase = GameTestCase(context, definition)
+            testCase.prepare()
         }
     }
 }

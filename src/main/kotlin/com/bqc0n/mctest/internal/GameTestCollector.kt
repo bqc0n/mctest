@@ -12,14 +12,11 @@ import java.lang.reflect.Method
 
 object GameTestCollector {
     fun collectGameTests(asmDataTable: ASMDataTable) {
-        val methods = mutableListOf<Method>()
-        val annotationClassName: String = GameTestHolder::class.java.canonicalName
-        val asmDataSet: Set<ASMDataTable.ASMData> = asmDataTable.getAll(annotationClassName)
+        val asmDataSet: Set<ASMDataTable.ASMData> = asmDataTable.getAll(GameTestHolder::class.java.canonicalName)
         for (asmData in asmDataSet) {
             val clazz: Class<*> = Class.forName(asmData.className)
             if (!clazz.isAnnotationPresent(GameTestHolder::class.java)) continue
             val holder = clazz.getAnnotation(GameTestHolder::class.java)!!
-            val gameTestNamespace = holder.namespace
             for (method in clazz.methods) {
                 if (!method.isAnnotationPresent(GameTest::class.java)) continue
                 validateTestMethod(method)
@@ -52,7 +49,7 @@ object GameTestCollector {
         return if (structureName.contains(":")) {
             ResourceLocation(structureName)
         } else {
-            ResourceLocation("${holder.namespace}:${clazz.simpleName}.${structureName.lowercase()}")
+            ResourceLocation(holder.namespace, "${clazz.simpleName}.${structureName.lowercase()}")
         }
     }
 

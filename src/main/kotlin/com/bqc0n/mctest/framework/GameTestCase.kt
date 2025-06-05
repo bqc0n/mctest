@@ -3,6 +3,7 @@ package com.bqc0n.mctest.framework
 import com.bqc0n.mctest.McTestLogger
 import net.minecraft.init.Blocks
 import net.minecraft.tileentity.TileEntityStructure
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.WorldServer
 
 class GameTestCase(
@@ -23,6 +24,12 @@ class GameTestCase(
             return
         }
         structureTile.mode = TileEntityStructure.Mode.LOAD
+        println(test.templateStructure.toString())
         structureTile.name = test.templateStructure.toString()
+    }
+
+    fun clearSpace() {
+        val structureBlockPos = context.structureBlockPos
+        BlockPos.getAllInBox(BlockPos.ORIGIN, BlockPos.ORIGIN)
     }
 }

@@ -1,5 +1,6 @@
 package com.bqc0n.mctest.framework
 
+@Target(AnnotationTarget.CLASS)
 annotation class GameTestHolder(
 
     /**
