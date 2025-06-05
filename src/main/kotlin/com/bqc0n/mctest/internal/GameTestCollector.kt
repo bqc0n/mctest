@@ -1,5 +1,6 @@
 package com.bqc0n.mctest.internal
 
+import com.bqc0n.mctest.McTest
 import com.bqc0n.mctest.framework.GameTest
 import com.bqc0n.mctest.framework.GameTestDefinition
 import com.bqc0n.mctest.framework.GameTestHolder
@@ -31,6 +32,7 @@ object GameTestCollector {
                     testName, structureLocation, setupTicks, timeOutTicks,
                     methodIntoConsumer(method)
                 )
+                McTest.testsTemp.add(definition)
             }
         }
     }
