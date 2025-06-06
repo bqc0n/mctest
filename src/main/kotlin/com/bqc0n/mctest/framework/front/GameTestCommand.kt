@@ -37,6 +37,6 @@ object GameTestCommand : CommandBase() {
     private fun runAll(server: MinecraftServer, sender: ICommandSender, args: Array<out String?>) {
         val worldServer = server.worlds[0] // Assuming the first world is the target
         val pos = sender.position
-        GameTestExecutor.runAll(worldServer, pos, sender)
+        GameTestExecutor.runAll(worldServer, sender)
     }
 }
