@@ -19,7 +19,9 @@ class GameTestCase(
     fun prepare() {
         val template = getStructureTemplate()
         if (template == null) return
-        clearSpace()
+        context.sender.sendMessage(TextComponentString(template.size.toString()))
+        clearSpace(template.size)
+        prepareSpace(template.size)
         val pos = context.structureBlockPos
         val world: WorldServer = context.world
         world.setBlockState(pos, Blocks.STRUCTURE_BLOCK.defaultState)
@@ -46,14 +48,28 @@ class GameTestCase(
         return template
     }
 
-    fun clearSpace() {
+    private fun clearSpace(templateSize: BlockPos) {
         val structureBlockPos = context.structureBlockPos
         val pos1 = structureBlockPos.add(-HORIZONTAL_INTERVAL, -VERTICAL_INTERVAL, -HORIZONTAL_INTERVAL)
-        val pos2 = structureBlockPos.add(HORIZONTAL_INTERVAL, VERTICAL_INTERVAL, HORIZONTAL_INTERVAL)
+        val pos2 = structureBlockPos
+            .add(templateSize).add(-1, -1, -1)
+            .add(HORIZONTAL_INTERVAL, VERTICAL_INTERVAL, HORIZONTAL_INTERVAL)
         BlockPos.getAllInBox(pos1, pos2).forEach { pos ->
             val world = context.world
             if (world.isAirBlock(pos)) return@forEach
             world.setBlockToAir(pos)
+        }
+    }
+
+    private fun prepareSpace(templateSize: BlockPos) {
+        val structureBlockPos = context.structureBlockPos
+        val pos1 = structureBlockPos.add(-HORIZONTAL_INTERVAL, -VERTICAL_INTERVAL, -HORIZONTAL_INTERVAL)
+        val pos2 = structureBlockPos
+            .add(templateSize).add(-1, -1 - templateSize.y, -1)
+            .add(HORIZONTAL_INTERVAL, 0, HORIZONTAL_INTERVAL)
+        BlockPos.getAllInBox(pos1, pos2).forEach { pos ->
+            val world = context.world
+            world.setBlockState(pos, Blocks.STONE.defaultState)
         }
     }
 }
