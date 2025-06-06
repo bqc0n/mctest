@@ -112,7 +112,7 @@ minecraft {
 // Generate a group.archives_base_name.Tags class
 tasks.injectTags.configure {
     // Change Tags class' name here:
-    outputClassName.set("${maven_group}.${archives_base_name}.Tags")
+    outputClassName.set("${maven_group}.Tags")
 }
 
 repositories {
@@ -163,6 +163,9 @@ dependencies {
             isTransitive = false
         }
     }
+
+    testImplementation("io.kotest:kotest-runner-junit5:5.8.1")
+    testImplementation("io.mockk:mockk:1.13.10")
 }
 
 // Adds Access Transformer files to tasks
@@ -252,4 +255,8 @@ idea {
 
 tasks.named("processIdeaSettings").configure {
     dependsOn("injectTags")
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
