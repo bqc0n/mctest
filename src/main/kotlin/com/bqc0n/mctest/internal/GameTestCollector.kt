@@ -43,13 +43,13 @@ object GameTestCollector {
     fun createStructureLocation(holder: GameTestHolder, clazz: Class<*>, method: Method): ResourceLocation {
         val gameTest = method.getAnnotation(GameTest::class.java)!!
         if (gameTest.template.isEmpty()) {
-            return ResourceLocation(holder.namespace, "${clazz.simpleName.lowercase()}.${method.name.lowercase()}")
+            return ResourceLocation(holder.namespace, "${clazz.simpleName.lowercase()}_${method.name.lowercase()}")
         }
         val structureName = gameTest.template
         return if (structureName.contains(":")) {
             ResourceLocation(structureName)
         } else {
-            ResourceLocation(holder.namespace, "${clazz.simpleName}.${structureName.lowercase()}")
+            ResourceLocation(holder.namespace, "${clazz.simpleName}_${structureName.lowercase()}")
         }
     }
 

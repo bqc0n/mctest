@@ -1,7 +1,5 @@
 package com.bqc0n.mctest
 
-import com.bqc0n.mctest.framework.GameTestDefinition
-import com.bqc0n.mctest.framework.GameTestHolder
 import com.bqc0n.mctest.framework.front.GameTestCommand
 import com.bqc0n.mctest.internal.GameTestCollector
 import net.minecraftforge.fml.common.Mod
