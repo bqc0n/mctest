@@ -21,7 +21,7 @@ class GameTestCase(
         if (template == null) return
         context.sender.sendMessage(TextComponentString(template.size.toString()))
         clearSpace(template.size)
-        prepareSpace(template.size)
+        encaseStructure(template.size)
         val pos = context.structureBlockPos
         val world: WorldServer = context.world
         world.setBlockState(pos, Blocks.STRUCTURE_BLOCK.defaultState)
@@ -37,6 +37,7 @@ class GameTestCase(
         structureTile.mode = TileEntityStructure.Mode.LOAD
         println(test.templateStructure.toString())
         structureTile.name = test.templateStructure.toString()
+        structureTile.load()
     }
 
     fun getStructureTemplate(): Template? {
@@ -50,26 +51,35 @@ class GameTestCase(
 
     private fun clearSpace(templateSize: BlockPos) {
         val structureBlockPos = context.structureBlockPos
+        val structureBlockY = structureBlockPos.y
         val pos1 = structureBlockPos.add(-HORIZONTAL_INTERVAL, -VERTICAL_INTERVAL, -HORIZONTAL_INTERVAL)
         val pos2 = structureBlockPos
             .add(templateSize).add(-1, -1, -1)
             .add(HORIZONTAL_INTERVAL, VERTICAL_INTERVAL, HORIZONTAL_INTERVAL)
         BlockPos.getAllInBox(pos1, pos2).forEach { pos ->
             val world = context.world
-            if (world.isAirBlock(pos)) return@forEach
-            world.setBlockToAir(pos)
+            if (pos.y < structureBlockY) {
+                world.setBlockState(pos, Blocks.STONE.defaultState)
+            } else {
+                world.setBlockToAir(pos)
+            }
+
         }
     }
 
-    private fun prepareSpace(templateSize: BlockPos) {
+    private fun encaseStructure(templateSize: BlockPos) {
         val structureBlockPos = context.structureBlockPos
-        val pos1 = structureBlockPos.add(-HORIZONTAL_INTERVAL, -VERTICAL_INTERVAL, -HORIZONTAL_INTERVAL)
+        val pos1 = structureBlockPos.add(-1, 1, -1)
         val pos2 = structureBlockPos
-            .add(templateSize).add(-1, -1 - templateSize.y, -1)
-            .add(HORIZONTAL_INTERVAL, 0, HORIZONTAL_INTERVAL)
+            .add(templateSize).add(0, 1, 0)
         BlockPos.getAllInBox(pos1, pos2).forEach { pos ->
             val world = context.world
-            world.setBlockState(pos, Blocks.STONE.defaultState)
+            val isEdge = (pos.x == pos1.x || pos.x == pos2.x)
+                    || (pos.z == pos1.z || pos.z == pos2.z)
+            val isTop = pos.y == pos2.y
+            if (isEdge || isTop) {
+                world.setBlockState(pos, Blocks.BARRIER.defaultState)
+            }
         }
     }
 }
