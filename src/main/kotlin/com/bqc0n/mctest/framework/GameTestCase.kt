@@ -18,6 +18,9 @@ class GameTestCase(
     private val context: GameTestContext,
     private val test: GameTestDefinition,
 ) {
+    var isDone = false
+        private set
+
     fun prepare() {
         val template = getStructureTemplate()
         if (template == null) return
@@ -46,7 +49,12 @@ class GameTestCase(
         val templateManager = context.world.structureTemplateManager
         val template = templateManager.get(context.world.minecraftServer, test.templateStructure)
         if (template == null) {
-            context.sender.sendMessage(TextComponentTranslation("mctest.structure_not_found", test.templateStructure.toString()))
+            context.sender.sendMessage(
+                TextComponentTranslation(
+                    "mctest.structure_not_found",
+                    test.templateStructure.toString()
+                )
+            )
         }
         return template
     }
@@ -104,5 +112,9 @@ class GameTestCase(
             McTestLogger.error("Error running test ${test.testName}", e)
             throw e
         }
+    }
+
+    fun tick() {
+
     }
 }
