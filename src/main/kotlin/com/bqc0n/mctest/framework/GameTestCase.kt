@@ -1,7 +1,9 @@
 package com.bqc0n.mctest.framework
 
 import com.bqc0n.mctest.McTestLogger
+import com.bqc0n.mctest.internal.GameTestHelperImpl
 import net.minecraft.init.Blocks
+import net.minecraft.item.EnumDyeColor
 import net.minecraft.tileentity.TileEntityStructure
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.TextComponentString
@@ -19,11 +21,11 @@ class GameTestCase(
     fun prepare() {
         val template = getStructureTemplate()
         if (template == null) return
-        context.sender.sendMessage(TextComponentString(template.size.toString()))
         clearSpace(template.size)
         encaseStructure(template.size)
         val pos = context.structureBlockPos
         val world: WorldServer = context.world
+        spawnBeacon()
         world.setBlockState(pos, Blocks.STRUCTURE_BLOCK.defaultState)
         val structureTile = world.getTileEntity(pos)
         if (structureTile == null) {
@@ -40,7 +42,7 @@ class GameTestCase(
         structureTile.load()
     }
 
-    fun getStructureTemplate(): Template? {
+    private fun getStructureTemplate(): Template? {
         val templateManager = context.world.structureTemplateManager
         val template = templateManager.get(context.world.minecraftServer, test.templateStructure)
         if (template == null) {
@@ -80,6 +82,27 @@ class GameTestCase(
             if (isEdge || isTop) {
                 world.setBlockState(pos, Blocks.BARRIER.defaultState)
             }
+        }
+    }
+
+    private fun spawnBeacon() {
+        val glassPos = context.structureBlockPos.add(-1, -1, -1)
+        val beaconPos = context.structureBlockPos.add(-1, -2, -1)
+        val world = context.world
+        world.setBlockState(glassPos, Blocks.STAINED_GLASS.getStateFromMeta(EnumDyeColor.GRAY.metadata))
+        world.setBlockState(beaconPos, Blocks.BEACON.defaultState)
+        BlockPos.getAllInBox(beaconPos.add(1, -1, 1), beaconPos.add(-1, -1, -1)).forEach { pos ->
+            world.setBlockState(pos, Blocks.IRON_BLOCK.defaultState)
+        }
+    }
+
+    fun run() {
+        val helper = GameTestHelperImpl(context, getStructureTemplate()!!.size)
+        try {
+            test.function.accept(helper)
+        } catch (e: Throwable) {
+            McTestLogger.error("Error running test ${test.testName}", e)
+            throw e
         }
     }
 }

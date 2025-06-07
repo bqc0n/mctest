@@ -1,5 +1,6 @@
 package com.bqc0n.mctest.framework
 
+import com.bqc0n.mctest.internal.GameTestHelperImpl
 import net.minecraft.command.ICommandSender
 import net.minecraft.init.Blocks
 import net.minecraft.util.math.BlockPos
@@ -23,6 +24,7 @@ object GameTestExecutor {
             val context = GameTestContext(world, pos, sender)
             val testCase = GameTestCase(context, definition)
             testCase.prepare()
+            testCase.run()
         }
     }
 }
