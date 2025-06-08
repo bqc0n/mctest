@@ -10,8 +10,8 @@ import net.minecraft.util.text.TextComponentTranslation
 import net.minecraft.world.WorldServer
 import net.minecraft.world.gen.structure.template.Template
 
-private const val HORIZONTAL_INTERVAL = 2
-private const val VERTICAL_INTERVAL = 2
+const val HORIZONTAL_INTERVAL = 2
+const val VERTICAL_INTERVAL = 2
 
 class GameTestCase(
     val context: GameTestContext,

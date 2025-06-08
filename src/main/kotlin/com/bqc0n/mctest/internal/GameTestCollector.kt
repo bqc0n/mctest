@@ -48,6 +48,7 @@ object GameTestCollector {
         return if (structureName.contains(":")) {
             ResourceLocation(structureName)
         } else {
+            println(ResourceLocation(holder.namespace, "${clazz.simpleName}_${structureName.lowercase()}"))
             ResourceLocation(holder.namespace, "${clazz.simpleName}_${structureName.lowercase()}")
         }
     }

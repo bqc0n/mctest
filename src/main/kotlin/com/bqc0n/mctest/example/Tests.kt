@@ -17,4 +17,11 @@ class Tests {
         helper.setBlock(pos, Blocks.BEDROCK)
         helper.succeedWhenBlockPresent(Blocks.STONE.defaultState, pos)
     }
+
+    @GameTest(template = "testexample")
+    fun placeDirt(helper: GameTestHelper) {
+        val pos = BlockPos.ORIGIN.up()
+        helper.setBlock(pos, Blocks.DIRT)
+        helper.succeedWhenBlockPresent(Blocks.DIRT.defaultState, pos)
+    }
 }

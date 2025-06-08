@@ -25,9 +25,7 @@ object GameTestExecutor {
             .first { world.isAirBlock(it) }
         val pos = groundPos.add(3, 0, 3)
         val reportingListener = ReportingGameTestListener()
-        GameTestRegistry.getAllTests().forEach { (name: String, definition: GameTestDefinition) ->
-            val context = GameTestContext(world, pos, sender)
-            val testCase = GameTestCase(context, definition)
+        GameTestStructureLocator().locateStructures(world, sender).forEach { testCase ->
             GameTestTicker.add(testCase)
             testCase.addListener(reportingListener)
             testCase.addListener(LoggingTestListener)
