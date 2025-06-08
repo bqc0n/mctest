@@ -123,7 +123,15 @@ class GameTestCase(
     fun tick() {
         this.tickCount = this.context.world.totalWorldTime - this.startTick
         if (this.tickCount > this.definition.timeoutTicks.toLong()) {
-            this.fail(GameTestTimeoutException("Didn't succeed or fail within ${definition.timeoutTicks} ticks."))
+            if (this.sequences.isEmpty()) {
+                this.fail(GameTestTimeoutException("Didn't succeed or fail within ${definition.timeoutTicks} ticks."))
+            } else {
+                // tickAndFailIfNotComplete() will fail this testCase and provides a more specific error message
+                this.sequences.forEach { it.tickAndFailIfNotComplete() }
+                if (this.error == null) {
+                    this.fail(GameTestTimeoutException("No sequence finished."))
+                }
+            }
         }
         this.sequences.forEach { it.tick() }
     }

@@ -32,6 +32,14 @@ class GameTestAssertSequence(
         }
     }
 
+    fun tickAndFailIfNotComplete() {
+        try {
+            this.tickAssertions()
+        } catch (e: GameTestAssertException) {
+            this.parent.fail(e)
+        }
+    }
+
     /**
      * Executes all assertions in this sequence.
      * If [GameTestAssertException] is thrown, retry from that assertion.
