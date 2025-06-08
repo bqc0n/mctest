@@ -15,5 +15,9 @@ class Tests {
         // Example test method
         println("Running example test")
         helper.setBlock(pos, Blocks.BEDROCK)
+        helper.succeedIf {
+            // This is where you would put your assertions
+            println("Assertions passed, test succeeded")
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.bqc0n.mctest.framework
 
+import com.bqc0n.mctest.internal.GameTestTicker
 import com.bqc0n.mctest.internal.ReportingGameTestListener
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.math.BlockPos
@@ -23,6 +24,7 @@ object GameTestExecutor {
         GameTestRegistry.getAllTests().forEach { (name: String, definition: GameTestDefinition) ->
             val context = GameTestContext(world, pos, sender)
             val testCase = GameTestCase(context, definition)
+            GameTestTicker.add(testCase)
             testCase.addListener(reportingListener)
             testCase.prepare()
             testCase.run()

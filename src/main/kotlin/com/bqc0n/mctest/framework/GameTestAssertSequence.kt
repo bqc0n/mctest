@@ -33,9 +33,11 @@ class GameTestAssertSequence(
     }
 
     private fun tickAssertions() {
-        for (assertion in assertions) {
+        val iterator = this.assertions.iterator()
+        while (iterator.hasNext()) {
+            val assertion = iterator.next()
             assertion.assertion.run()
-            assertions.remove(assertion)
+            iterator.remove() // Remove the assertion if it succeeded
         }
     }
 }

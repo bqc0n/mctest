@@ -21,6 +21,7 @@ class GameTestCase(
 
     private var error: Throwable? = null
     private val listeners = mutableListOf<IGameTestListener>()
+    private val sequences = mutableListOf<GameTestAssertSequence>()
 
     fun addListener(listener: IGameTestListener) {
         listeners.add(listener)
@@ -98,7 +99,7 @@ class GameTestCase(
     }
 
     fun run() {
-        val helper = GameTestHelper(context, getStructureTemplate()!!.size)
+        val helper = GameTestHelper(this, getStructureTemplate()!!.size)
         try {
             definition.function.accept(helper)
         } catch (e: Throwable) {
@@ -107,12 +108,18 @@ class GameTestCase(
         }
     }
 
-    fun tick() {
+    fun createSequence(): GameTestAssertSequence {
+        val sequence = GameTestAssertSequence(this)
+        sequences.add(sequence)
+        return sequence
+    }
 
+    fun tick() {
+        this.sequences.forEach { it.tick() }
     }
 
     fun succeed() {
-        if (this.error != null) {
+        if (this.error == null) {
             this.finish()
             this.isDone = true
             this.listeners.forEach { it.testPassed(this) }

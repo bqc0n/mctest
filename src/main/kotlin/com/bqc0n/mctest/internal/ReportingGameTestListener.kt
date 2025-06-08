@@ -14,7 +14,7 @@ class ReportingGameTestListener : IGameTestListener {
     }
 
     override fun testPassed(case: GameTestCase) {
-        updateBeaconGlass(case, EnumDyeColor.GREEN)
+        updateBeaconGlass(case, EnumDyeColor.LIME)
     }
 
     override fun testFailed(case: GameTestCase, reason: Throwable) {

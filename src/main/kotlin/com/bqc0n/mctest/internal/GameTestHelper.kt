@@ -1,5 +1,6 @@
 package com.bqc0n.mctest.internal
 
+import com.bqc0n.mctest.framework.GameTestCase
 import com.bqc0n.mctest.framework.GameTestContext
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
@@ -7,11 +8,13 @@ import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.BlockPos
 
 class GameTestHelper(
-    context: GameTestContext,
+    val testCase: GameTestCase,
     val structureSize: BlockPos,
 ) {
-    val world = context.world
-    val absolutePos = context.structureBlockPos
+    val world = testCase.context.world
+    val absolutePos = testCase.context.structureBlockPos
+
+    private var finalCheckAdded = false
 
     @Suppress("UNCHECKED_CAST")
     fun <T : TileEntity> getTileEntity(pos: BlockPos): T? {
@@ -43,4 +46,16 @@ class GameTestHelper(
 
     // Asserting
 
+    private fun ensureSingleFinalCheck() {
+        if (this.finalCheckAdded) {
+            throw IllegalStateException("This test already has final clause")
+        } else {
+            this.finalCheckAdded = true
+        }
+    }
+
+    fun succeedIf(criteria: Runnable) {
+        this.ensureSingleFinalCheck()
+        this.testCase.createSequence().thenWaitUntil(criteria).thenSucceed()
+    }
 }
