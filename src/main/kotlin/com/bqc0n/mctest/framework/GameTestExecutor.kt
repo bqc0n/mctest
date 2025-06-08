@@ -6,6 +6,10 @@ import net.minecraft.command.ICommandSender
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.WorldServer
 
+/**
+ * This object is responsible for executing game tests.
+ * Frontend commands will call the methods in this object to run tests.
+ */
 object GameTestExecutor {
     fun run(world: WorldServer, pos: BlockPos, sender: ICommandSender, testName: String): Boolean {
         val def = GameTestRegistry.getTest(testName)
@@ -26,8 +30,9 @@ object GameTestExecutor {
             val testCase = GameTestCase(context, definition)
             GameTestTicker.add(testCase)
             testCase.addListener(reportingListener)
+            testCase.addListener(LoggingTestListener)
             testCase.prepare()
-            testCase.run()
+            testCase.run(0)
         }
     }
 }

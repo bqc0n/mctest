@@ -1,4 +1,4 @@
-package com.bqc0n.mctest.tests
+package com.bqc0n.mctest.example
 
 import com.bqc0n.mctest.Tags
 import com.bqc0n.mctest.framework.GameTest
@@ -15,9 +15,6 @@ class Tests {
         // Example test method
         println("Running example test")
         helper.setBlock(pos, Blocks.BEDROCK)
-        helper.succeedIf {
-            // This is where you would put your assertions
-            println("Assertions passed, test succeeded")
-        }
+        helper.succeedWhenBlockPresent(Blocks.STONE.defaultState, pos)
     }
 }

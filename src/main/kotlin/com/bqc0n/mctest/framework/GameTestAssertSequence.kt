@@ -27,11 +27,15 @@ class GameTestAssertSequence(
     fun tick() {
         try {
             this.tickAssertions()
-        } catch (e: GameTestAssertException) {
+        } catch (_: GameTestAssertException) {
             // just retry
         }
     }
 
+    /**
+     * Executes all assertions in this sequence.
+     * If [GameTestAssertException] is thrown, retry from that assertion.
+     */
     private fun tickAssertions() {
         val iterator = this.assertions.iterator()
         while (iterator.hasNext()) {

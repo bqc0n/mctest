@@ -1,6 +1,5 @@
 package com.bqc0n.mctest.framework.front
 
-import com.bqc0n.mctest.framework.GameTestContext
 import com.bqc0n.mctest.framework.GameTestExecutor
 import net.minecraft.command.CommandBase
 import net.minecraft.command.CommandException

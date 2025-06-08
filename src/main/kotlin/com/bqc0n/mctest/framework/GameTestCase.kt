@@ -1,6 +1,7 @@
 package com.bqc0n.mctest.framework
 
 import com.bqc0n.mctest.McTestLogger
+import com.bqc0n.mctest.framework.exception.GameTestTimeoutException
 import com.bqc0n.mctest.internal.GameTestHelper
 import net.minecraft.init.Blocks
 import net.minecraft.tileentity.TileEntityStructure
@@ -19,9 +20,13 @@ class GameTestCase(
     var isDone = false
         private set
 
+    private var startTick: Long = 0
+    private var tickCount: Long = 0
+
     private var error: Throwable? = null
     private val listeners = mutableListOf<IGameTestListener>()
     private val sequences = mutableListOf<GameTestAssertSequence>()
+
 
     fun addListener(listener: IGameTestListener) {
         listeners.add(listener)
@@ -98,8 +103,9 @@ class GameTestCase(
         }
     }
 
-    fun run() {
+    fun run(delay: Long) {
         val helper = GameTestHelper(this, getStructureTemplate()!!.size)
+        this.startTick = context.world.totalWorldTime + definition.setupTicks + delay
         try {
             definition.function.accept(helper)
         } catch (e: Throwable) {
@@ -115,6 +121,10 @@ class GameTestCase(
     }
 
     fun tick() {
+        this.tickCount = this.context.world.totalWorldTime - this.startTick
+        if (this.tickCount > this.definition.timeoutTicks.toLong()) {
+            this.fail(GameTestTimeoutException("Didn't succeed or fail within ${definition.timeoutTicks} ticks."))
+        }
         this.sequences.forEach { it.tick() }
     }
 
