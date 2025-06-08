@@ -2,7 +2,6 @@ package com.bqc0n.mctest.internal
 
 import com.bqc0n.mctest.framework.GameTestCase
 import com.bqc0n.mctest.framework.IGameTestListener
-import com.bqc0n.mctest.framework.exception.GameTestAssertException
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.util.math.BlockPos
@@ -18,7 +17,7 @@ class ReportingGameTestListener : IGameTestListener {
         updateBeaconGlass(case, EnumDyeColor.GREEN)
     }
 
-    override fun testFailed(case: GameTestCase, reason: GameTestAssertException) {
+    override fun testFailed(case: GameTestCase, reason: Throwable) {
         updateBeaconGlass(case, EnumDyeColor.RED)
     }
 

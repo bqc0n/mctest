@@ -121,7 +121,7 @@ class GameTestCase(
         }
     }
 
-    fun fail(e: GameTestAssertException) {
+    fun fail(e: Throwable) {
         this.finish()
         this.error = e
         this.listeners.forEach { it.testFailed(this, e) }
