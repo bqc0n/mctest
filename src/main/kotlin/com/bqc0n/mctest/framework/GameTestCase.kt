@@ -1,10 +1,8 @@
 package com.bqc0n.mctest.framework
 
 import com.bqc0n.mctest.McTestLogger
-import com.bqc0n.mctest.framework.exception.GameTestAssertException
-import com.bqc0n.mctest.internal.GameTestHelperImpl
+import com.bqc0n.mctest.internal.GameTestHelper
 import net.minecraft.init.Blocks
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.tileentity.TileEntityStructure
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.text.TextComponentTranslation
@@ -100,7 +98,7 @@ class GameTestCase(
     }
 
     fun run() {
-        val helper = GameTestHelperImpl(context, getStructureTemplate()!!.size)
+        val helper = GameTestHelper(context, getStructureTemplate()!!.size)
         try {
             definition.function.accept(helper)
         } catch (e: Throwable) {
