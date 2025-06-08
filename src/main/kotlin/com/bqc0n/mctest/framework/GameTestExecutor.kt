@@ -1,6 +1,7 @@
 package com.bqc0n.mctest.framework
 
 import com.bqc0n.mctest.internal.GameTestHelperImpl
+import com.bqc0n.mctest.internal.ReportingGameTestListener
 import net.minecraft.command.ICommandSender
 import net.minecraft.init.Blocks
 import net.minecraft.util.math.BlockPos
@@ -20,9 +21,11 @@ object GameTestExecutor {
         val groundPos = BlockPos.getAllInBox(senderPos, senderPos.down(senderPos.y))
             .first { world.isAirBlock(it) }
         val pos = groundPos.add(3, 0, 3)
+        val reportingListener = ReportingGameTestListener()
         GameTestRegistry.getAllTests().forEach { (name: String, definition: GameTestDefinition) ->
             val context = GameTestContext(world, pos, sender)
             val testCase = GameTestCase(context, definition)
+            testCase.addListener(reportingListener)
             testCase.prepare()
             testCase.run()
         }
