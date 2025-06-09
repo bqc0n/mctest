@@ -1,6 +1,5 @@
 package com.bqc0n.mctest.framework.front
 
-import com.bqc0n.mctest.framework.GameTestContext
 import com.bqc0n.mctest.framework.GameTestExecutor
 import net.minecraft.command.CommandBase
 import net.minecraft.command.CommandException
@@ -36,7 +35,6 @@ object GameTestCommand : CommandBase() {
 
     private fun runAll(server: MinecraftServer, sender: ICommandSender, args: Array<out String?>) {
         val worldServer = server.worlds[0] // Assuming the first world is the target
-        val pos = sender.position
         GameTestExecutor.runAll(worldServer, sender)
     }
 }

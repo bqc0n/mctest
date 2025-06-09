@@ -2,8 +2,8 @@ package com.bqc0n.mctest
 
 import com.bqc0n.mctest.framework.GameTest
 import com.bqc0n.mctest.framework.GameTestHolder
-import com.bqc0n.mctest.framework.IGameTestHelper
 import com.bqc0n.mctest.internal.GameTestCollector
+import com.bqc0n.mctest.internal.GameTestHelper
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.shouldBe
 import java.lang.reflect.Method
@@ -18,13 +18,13 @@ class TestNames : StringSpec({
 
     beforeTest {
         clazz = KotlinTests::class.java
-        gameTestHolder = clazz.getAnnotation(GameTestHolder::class.java)
+        gameTestHolder = clazz.getAnnotation(GameTestHolder::class.java)!!
         for (method in clazz.declaredMethods) {
             println(method)
         }
-        simpleTest = clazz.getMethod("simpleTest", IGameTestHelper::class.java)
-        templateNamed = clazz.getMethod("templateNamed", IGameTestHelper::class.java)
-        templateNamespaced = clazz.getMethod("templateNamespaced", IGameTestHelper::class.java)
+        simpleTest = clazz.getMethod("simpleTest", GameTestHelper::class.java)
+        templateNamed = clazz.getMethod("templateNamed", GameTestHelper::class.java)
+        templateNamespaced = clazz.getMethod("templateNamespaced", GameTestHelper::class.java)
     }
 
     "Test simpleTest name" {

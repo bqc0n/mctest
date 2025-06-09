@@ -4,7 +4,6 @@ import com.bqc0n.mctest.framework.GameTest
 import com.bqc0n.mctest.framework.GameTestDefinition
 import com.bqc0n.mctest.framework.GameTestHolder
 import com.bqc0n.mctest.framework.GameTestRegistry
-import com.bqc0n.mctest.framework.IGameTestHelper
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.fml.common.discovery.ASMDataTable
 import org.jetbrains.annotations.VisibleForTesting
@@ -49,20 +48,21 @@ object GameTestCollector {
         return if (structureName.contains(":")) {
             ResourceLocation(structureName)
         } else {
+            println(ResourceLocation(holder.namespace, "${clazz.simpleName}_${structureName.lowercase()}"))
             ResourceLocation(holder.namespace, "${clazz.simpleName}_${structureName.lowercase()}")
         }
     }
 
     private fun validateTestMethod(method: Method) {
-        if (method.parameterCount != 1 || method.parameters[0].type != IGameTestHelper::class.java) {
+        if (method.parameterCount != 1 || method.parameters[0].type != GameTestHelper::class.java) {
             throw IllegalArgumentException(
                 "Game test method '${method.name}' must have exactly one parameter of type IGameTestHelper."
             )
         }
     }
 
-    private fun methodIntoConsumer(method: Method): java.util.function.Consumer<IGameTestHelper> {
-        return java.util.function.Consumer { helper: IGameTestHelper ->
+    private fun methodIntoConsumer(method: Method): java.util.function.Consumer<GameTestHelper> {
+        return java.util.function.Consumer { helper: GameTestHelper ->
             try {
                 if (java.lang.reflect.Modifier.isStatic(method.modifiers)) {
                     method.invoke(null, helper)
