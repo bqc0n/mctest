@@ -11,7 +11,7 @@ import net.minecraft.world.WorldServer
  * Frontend commands will call the methods in this object to run tests.
  */
 object GameTestExecutor {
-    fun run(world: WorldServer, pos: BlockPos, sender: ICommandSender, testName: String): Boolean {
+    fun runByName(world: WorldServer, pos: BlockPos, sender: ICommandSender, testName: String): Boolean {
         val def = GameTestRegistry.getTest(testName)
         if (def == null) return false
         val context = GameTestContext(world, pos, sender)
@@ -23,16 +23,18 @@ object GameTestExecutor {
         val senderPos = sender.position
         val groundPos = BlockPos.getAllInBox(senderPos, senderPos.down(senderPos.y))
             .first { world.isAirBlock(it) }
-        val pos = groundPos.add(3, 0, 3)
-        val reportingListener = ReportingGameTestListener()
-        val chatReportingListener = ChatReportingTestListener(sender)
         GameTestStructureLocator().locateStructures(world, sender).forEach { testCase ->
-            GameTestTicker.add(testCase)
-            testCase.addListener(reportingListener)
-            testCase.addListener(LoggingTestListener)
-            testCase.addListener(chatReportingListener)
-            testCase.prepare()
-            testCase.run(0)
+            this.runTest(testCase)
         }
+    }
+
+    private fun runTest(testCase: GameTestCase) {
+        val chatReportingListener = ChatReportingTestListener(testCase.context.sender)
+        GameTestTicker.add(testCase)
+        testCase.addListener(ReportingGameTestListener)
+        testCase.addListener(LoggingTestListener)
+        testCase.addListener(chatReportingListener)
+        testCase.prepare()
+        testCase.run(0)
     }
 }

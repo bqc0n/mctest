@@ -10,12 +10,12 @@ class ChatReportingTestListener(
     override fun testStructureLoaded(case: GameTestCase) {}
 
     override fun testPassed(case: GameTestCase) {
-        val msg = "${TextFormatting.GREEN}${case.definition.testName} passed."
+        val msg = "${TextFormatting.GREEN}${case.definition.testName} passed. (${case.tickCount} ticks)"
         sender.sendMessage(TextComponentString(msg))
     }
 
     override fun testFailed(case: GameTestCase, reason: Throwable) {
-        val msg =  "${TextFormatting.RED}${case.definition.testName} failed."
+        val msg =  "${TextFormatting.RED}${case.definition.testName} failed: ${reason.message}"
         sender.sendMessage(TextComponentString(msg))
     }
 }

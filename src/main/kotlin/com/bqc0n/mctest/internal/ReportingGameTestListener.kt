@@ -7,7 +7,7 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraft.util.math.BlockPos
 
 @Suppress("DEPRECATION")
-class ReportingGameTestListener : IGameTestListener {
+object ReportingGameTestListener : IGameTestListener {
     override fun testStructureLoaded(case: GameTestCase) {
         spawnBeacon(case)
         updateBeaconGlass(case, EnumDyeColor.GRAY)

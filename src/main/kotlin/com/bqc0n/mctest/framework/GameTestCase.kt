@@ -21,7 +21,8 @@ class GameTestCase(
         private set
 
     private var startTick: Long = 0
-    private var tickCount: Long = 0
+    var tickCount: Long = 0
+        private set
 
     private var error: Throwable? = null
     private val listeners = mutableListOf<IGameTestListener>()
