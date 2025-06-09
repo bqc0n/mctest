@@ -25,10 +25,12 @@ object GameTestExecutor {
             .first { world.isAirBlock(it) }
         val pos = groundPos.add(3, 0, 3)
         val reportingListener = ReportingGameTestListener()
+        val chatReportingListener = ChatReportingTestListener(sender)
         GameTestStructureLocator().locateStructures(world, sender).forEach { testCase ->
             GameTestTicker.add(testCase)
             testCase.addListener(reportingListener)
             testCase.addListener(LoggingTestListener)
+            testCase.addListener(chatReportingListener)
             testCase.prepare()
             testCase.run(0)
         }
