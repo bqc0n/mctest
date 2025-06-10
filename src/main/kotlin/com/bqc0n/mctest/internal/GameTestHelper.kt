@@ -1,6 +1,7 @@
 package com.bqc0n.mctest.internal
 
 import com.bqc0n.mctest.framework.GameTestCase
+import com.bqc0n.mctest.framework.exception.GameTestAssertException
 import com.bqc0n.mctest.framework.exception.GameTestAssertPosException
 import net.minecraft.block.Block
 import net.minecraft.block.state.IBlockState
@@ -18,8 +19,8 @@ class GameTestHelper(
     private var finalCheckAdded = false
 
     @Suppress("UNCHECKED_CAST")
-    fun <T : TileEntity> getTileEntity(pos: BlockPos): T? {
-        val te =  world.getTileEntity(pos)
+    fun <T : TileEntity> getTileEntity(relPos: BlockPos): T? {
+        val te =  world.getTileEntity(this.absolute(relPos))
         if (te == null) return null
         return te as? T
     }
@@ -58,6 +59,10 @@ class GameTestHelper(
         } else {
             this.finalCheckAdded = true
         }
+    }
+
+    fun fail(message: String) {
+        throw GameTestAssertException(message)
     }
 
     fun succeedIf(criteria: Runnable) {
