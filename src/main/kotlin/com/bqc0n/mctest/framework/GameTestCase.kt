@@ -1,6 +1,7 @@
 package com.bqc0n.mctest.framework
 
 import com.bqc0n.mctest.McTestLogger
+import com.bqc0n.mctest.framework.exception.GameTestAssertException
 import com.bqc0n.mctest.framework.exception.GameTestTimeoutException
 import com.bqc0n.mctest.internal.GameTestHelper
 import net.minecraft.init.Blocks
@@ -19,6 +20,8 @@ class GameTestCase(
 ) {
     var isDone = false
         private set
+    var isStarted = false
+        private set
 
     private var startTick: Long = 0
     var tickCount: Long = 0
@@ -35,7 +38,6 @@ class GameTestCase(
 
     fun prepare() {
         val template = getStructureTemplate()
-        if (template == null) return
         clearSpace(template.size)
         encaseStructure(template.size)
         val pos = context.structureBlockPos
@@ -56,7 +58,7 @@ class GameTestCase(
         listeners.forEach { it.testStructureLoaded(this) }
     }
 
-    private fun getStructureTemplate(): Template? {
+    private fun getStructureTemplate(): Template {
         val templateManager = context.world.structureTemplateManager
         val template = templateManager.get(context.world.minecraftServer, definition.templateStructure)
         if (template == null) {
@@ -67,7 +69,8 @@ class GameTestCase(
                 )
             )
         }
-        return template
+        // TODO: Template not found should be handled somewhere early! factory method?
+        return template!!
     }
 
     private fun clearSpace(templateSize: BlockPos) {
@@ -105,14 +108,7 @@ class GameTestCase(
     }
 
     fun run(delay: Long) {
-        val helper = GameTestHelper(this, getStructureTemplate()!!.size)
         this.startTick = context.world.totalWorldTime + definition.setupTicks + delay
-        try {
-            definition.function.accept(helper)
-        } catch (e: Throwable) {
-            McTestLogger.error("Error running test ${definition.testName}", e)
-            throw e
-        }
     }
 
     fun createSequence(): GameTestAssertSequence {
@@ -123,18 +119,42 @@ class GameTestCase(
 
     fun tick() {
         this.tickCount = this.context.world.totalWorldTime - this.startTick
-        if (this.tickCount > this.definition.timeoutTicks.toLong()) {
+        if (tickCount < 0) {
+            // for startUp & delaying
+            return
+        }
+        if (!this.isStarted) {
+            this.startOnFirstTick()
+        }
+        val timeout = this.tickCount > this.definition.timeoutTicks.toLong()
+        if (timeout) {
             if (this.sequences.isEmpty()) {
                 this.fail(GameTestTimeoutException("Didn't succeed or fail within ${definition.timeoutTicks} ticks."))
             } else {
                 // tickAndFailIfNotComplete() will fail this testCase and provides a more specific error message
-                this.sequences.forEach { it.tickAndFailIfNotComplete() }
+                this.sequences.forEach { it.tickAndFailIfNotComplete(this.tickCount) }
                 if (this.error == null) {
                     this.fail(GameTestTimeoutException("No sequence finished."))
                 }
             }
+        } else {
+            this.sequences.forEach { it.tickAndContinue(this.tickCount) }
         }
-        this.sequences.forEach { it.tick() }
+    }
+
+    private fun startOnFirstTick() {
+        if (!this.isStarted) {
+            this.isStarted = true
+
+            try {
+                definition.function.accept(GameTestHelper(this, getStructureTemplate().size))
+            } catch (e: GameTestAssertException) {
+                this.fail(e)
+            } catch (e: Throwable) {
+                McTestLogger.error("Error while running test ${definition.testName}: ${e.message}", e)
+                this.fail(e)
+            }
+        }
     }
 
     fun succeed() {
