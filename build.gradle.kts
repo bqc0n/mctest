@@ -262,6 +262,15 @@ tasks.withType<Test>().configureEach {
 }
 
 publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = maven_group
+            artifactId = archives_base_name
+            version = mod_version
+
+            from(components["java"])
+        }
+    }
     repositories {
         maven {
             name = "GitHubPackages"
