@@ -1,13 +1,14 @@
+import cl.franciscosolis.sonatypecentralupload.SonatypeCentralUploadTask
 import org.jetbrains.gradle.ext.Gradle
 import org.jetbrains.gradle.ext.compiler
 import org.jetbrains.gradle.ext.runConfigurations
 import org.jetbrains.gradle.ext.settings
 
-buildscript { 
+buildscript {
     repositories {
         mavenCentral()
     }
-    
+
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${libs.versions.kotlinVersion}")
     }
@@ -17,6 +18,7 @@ plugins {
     id("java")
     id("java-library")
     kotlin("jvm") version libs.versions.kotlinVersion
+    id("cl.franciscosolis.sonatype-central-upload") version "1.0.2"
     id("maven-publish")
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
     id("eclipse")
@@ -59,7 +61,7 @@ java {
     }
     // Generate sources and javadocs jars when building and publishing
     withSourcesJar()
-    // withJavadocJar()
+    withJavadocJar()
 }
 
 tasks.withType<JavaCompile>().configureEach {
@@ -138,7 +140,7 @@ dependencies {
     implementation("io.github.chaosunity.forgelin:Forgelin-Continuous:${forgelin_continuous_version}") {
         exclude("net.minecraftforge")
     }
-    
+
     if (use_assetmover.toBoolean()) {
         implementation("com.cleanroommc:assetmover:2.5")
     }
@@ -261,6 +263,10 @@ tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
 
+// These are required for publishing to Maven Central
+project.version = mod_version
+project.group = maven_group
+
 publishing {
     publications {
         create<MavenPublication>("maven") {
@@ -269,16 +275,53 @@ publishing {
             version = mod_version
 
             from(components["java"])
-        }
-    }
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/bqc0n/mctest")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
+
+            pom {
+                name.set(project.name)
+                url.set("https://github.com/bqc0n/mctest")
+                description.set("Game Tests backport for 1.12.2.")
+                licenses {
+                    license {
+                        name.set("MIT License")
+                        url.set("https://github.com/bqc0n/mctest/blob/main/LICENSE")
+                        distribution.set("repo")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("bqc0n")
+                        name.set("bqc0n")
+                        email.set("me@bqc0n.com")
+                        timezone.set("Asia/Tokyo")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git://github.com/bqc0n/mctest")
+                    developerConnection.set("scm:git:ssh://github.com/bqc0n/mctest.git")
+                    url.set("https://github.com/bqc0n/mctest")
+                }
             }
         }
     }
+}
+
+tasks.named<SonatypeCentralUploadTask>("sonatypeCentralUpload") {
+    // task "reobfJar" generates .jar, task "jar" generates .dev-jar
+    dependsOn("jar", "reobfJar", "sourcesJar", "javadocJar", "generatePomFileForMavenPublication")
+
+    username.set(System.getenv("SONATYPE_CENTRAL_USERNAME"))
+    password.set(System.getenv("SONATYPE_CENTRAL_PASSWORD"))
+
+    archives.set(files(
+        tasks.named("jar"),
+        tasks.named("reobfJar"),
+        tasks.named("sourcesJar"),
+        tasks.named("javadocJar"),
+    ))
+    pom.set(file(
+        tasks.named("generatePomFileForMavenPublication").get().outputs.files.single()
+    ))
+
+    signingKey.set(System.getenv("PGP_SIGNING_KEY"))
+    signingKeyPassphrase.set(System.getenv("PGP_SIGNING_KEY_PASSPHRASE"))
 }
