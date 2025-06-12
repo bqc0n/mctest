@@ -34,7 +34,7 @@ class TestNames : StringSpec({
 
     "Test simpleTest structure location" {
         val structureLocation = GameTestCollector.createStructureLocation(gameTestHolder, clazz, simpleTest)
-        structureLocation.toString() shouldBe "mctest:kotlintests.simpletest"
+        structureLocation.toString() shouldBe "mctest:kotlintests_simpletest"
     }
 
     "Test templateNamed name" {
@@ -44,7 +44,7 @@ class TestNames : StringSpec({
 
     "Test templateNamed structure location" {
         val structureLocation = GameTestCollector.createStructureLocation(gameTestHolder, clazz, templateNamed)
-        structureLocation.toString() shouldBe "mctest:kotlintests.somename"
+        structureLocation.toString() shouldBe "mctest:kotlintests_somename"
     }
 
     "Test templateNamespaced name" {
