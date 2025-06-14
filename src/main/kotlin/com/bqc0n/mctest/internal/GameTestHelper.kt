@@ -4,7 +4,10 @@ import com.bqc0n.mctest.framework.GameTestCase
 import com.bqc0n.mctest.framework.exception.GameTestAssertException
 import com.bqc0n.mctest.framework.exception.GameTestAssertPosException
 import net.minecraft.block.Block
+import net.minecraft.block.BlockButton
 import net.minecraft.block.state.IBlockState
+import net.minecraft.entity.item.EntityItem
+import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.util.math.BlockPos
 import java.util.function.Predicate
@@ -31,6 +34,23 @@ class GameTestHelper(
 
     fun relative(absolutePos: BlockPos): BlockPos {
         return absolutePos.subtract(this.absolutePos)
+    }
+
+    fun spawnItem(item: ItemStack, relPos: BlockPos): EntityItem {
+        validateBlockPos(relPos)
+        val absolutePos = absolute(relPos)
+        val itemEntity = EntityItem(world, absolutePos.x.toDouble(), absolutePos.y.toDouble(), absolutePos.z.toDouble(), item)
+        itemEntity.motionX = 0.0
+        itemEntity.motionY = 0.0
+        itemEntity.motionZ = 0.0
+        world.spawnEntity(itemEntity)
+        return itemEntity
+    }
+
+    fun pressButton(relPos: BlockPos) {
+        this.assertBlock(relPos, { it.block is BlockButton }, "Expected a button at $relPos")
+        val buttonBlock = getBlockState(relPos).block as BlockButton
+        world.setBlockState(absolute(relPos), buttonBlock.defaultState.withProperty(BlockButton.POWERED, true))
     }
 
     fun setBlock(relPos: BlockPos, block: Block) = setBlock(relPos, block.defaultState)
@@ -65,6 +85,12 @@ class GameTestHelper(
         throw GameTestAssertException(message)
     }
 
+    fun assertTrue(condition: Boolean, message: String) {
+        if (!condition) {
+            throw GameTestAssertException(message)
+        }
+    }
+
     fun succeedIf(criteria: Runnable) {
         this.ensureSingleFinalCheck()
         this.testCase.createSequence().thenWaitUntil(criteria).thenSucceed()
@@ -84,5 +110,21 @@ class GameTestHelper(
 
     fun assertBlockPresent(state: IBlockState, relPos: BlockPos) {
         this.assertBlock(relPos,  { it == state }, "Expected $state, but was ${getBlockState(relPos)}")
+    }
+
+    fun assertBlockPresent(block: Block, relPos: BlockPos) {
+        this.assertBlock(relPos, { it.block == block }, "Expected $block, but was ${getBlockState(relPos).block}")
+    }
+
+    fun assertBlockNotPresent(state: IBlockState, relPos: BlockPos) {
+        this.assertBlock(relPos, { it != state }, "Did not expected $state at $relPos.")
+    }
+
+    fun assertBlockNotPresent(block: Block, relPos: BlockPos) {
+        this.assertBlock(relPos, { it.block != block }, "Did not expected $block at $relPos.")
+    }
+
+    fun assertBlockNotPresent(relPos: BlockPos) {
+        this.assertBlock(relPos, { it.block.isAir(it, world, absolute(relPos)) }, "Expected air at $relPos, but was ${getBlockState(relPos).block}")
     }
 }
