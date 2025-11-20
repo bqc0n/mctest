@@ -1,0 +1,6 @@
+- [ ] runGameTestServer gradle task
+  - create superflat world
+  - locate, prepare tests
+  - execute tests
+  - gather results
+  - exit
